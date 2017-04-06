@@ -1,0 +1,10 @@
+input{
+	padding: 5px;
+	text-align: center;
+}
+
+button{
+	width: 155px;
+	height: 28px;
+	/*background-color: #fff;*/
+}
