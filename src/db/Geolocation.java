@@ -93,8 +93,9 @@ public class Geolocation {
 	
 	private static ArrayList<String> getSitenames() {
 		ArrayList<String> res = new ArrayList<>();
+		Scanner in = null;
 		try {
-			Scanner in = new Scanner(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/data/PPR_Assets.csv"));
+			in = new Scanner(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/data/PPR_Assets.csv"));
 			
 			while(in.hasNextLine()) {
 				res.add(in.nextLine());
@@ -102,6 +103,8 @@ public class Geolocation {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			in.close();
 		}
 		
 		return res;
