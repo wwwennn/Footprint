@@ -1,5 +1,7 @@
 package servlets;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
@@ -21,14 +23,29 @@ public class LoginServlet extends HttpServlet {
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String approot = getServletConfig().getServletContext().getInitParameter("approot");
 		ServletOutputStream out = response.getOutputStream();
-		out.println("<html>");
-		out.println("<form action=\"/login\" method=\"post\">" +
-				"User Name: <input type = \"text\" name=\"username\"><br>" +
-				"Password: <input type = \"text\" name=\"password\"><br>" + 
-				"<input type = \"submit\" value = \"Login\" > </form>");
-		out.println("</html>");
+//		out.println("<html>");
+//		out.println("<form action=\"/login\" method=\"post\">" +
+//				"User Name: <input type = \"text\" name=\"username\"><br>" +
+//				"Password: <input type = \"text\" name=\"password\"><br>" + 
+//				"<input type = \"submit\" value = \"Login\" > </form>");
+//		FileInputStream in = new FileInputStream("./webpage/index.html");
+		out.println(serveLoginPage(approot));
+//		out.println("</html>");
 		return;
+	}
+	
+	private String serveLoginPage(String approot) throws IOException {
+		BufferedReader in = new BufferedReader(new FileReader(approot + "/webpage/index.html"));
+		StringBuilder builder = new StringBuilder();
+		String line = in.readLine();
+		while (line != null) {
+			builder.append(line);
+			line = in.readLine();
+		}
+		in.close();
+		return builder.toString();
 	}
 
 }
