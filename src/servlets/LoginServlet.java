@@ -23,7 +23,7 @@ public class LoginServlet extends HttpServlet {
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String approot = getServletConfig().getServletContext().getInitParameter("approot");
+		String approot = getServletContext().getInitParameter("approot");
 		ServletOutputStream out = response.getOutputStream();
 //		out.println("<html>");
 //		out.println("<form action=\"/login\" method=\"post\">" +
