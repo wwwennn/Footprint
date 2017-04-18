@@ -16,6 +16,12 @@ public class User {
 	private String firstname;
 	private String pwd;
 	
+	public void setup(String username, String lastname, String firstname, String pwd) {
+		this.username = username;
+		this.lastname = lastname;
+		this.firstname = firstname;
+		this.pwd = pwd;
+	}
 	
 	public String getUsername() {
 		return username;

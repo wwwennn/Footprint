@@ -10,6 +10,11 @@
   <context-param>
     <param-name>approot</param-name>
     <param-value>/home/botian/Documents/CIT594/Footprint</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>dbroot</param-name>
+    <param-value>/home/botian/Documents/CIT594/Footprint/storage</param-value>
   </context-param>   
 
   <servlet>
