@@ -24,8 +24,12 @@ public class HomeServlet extends HttpServlet {
 			response.sendRedirect("/home");
 			return;
 		}
+		
+		System.out.println("Get a request from home");
 		HttpSession session = request.getSession(false);
+		System.out.println("Strange");
 		if (session != null) { // user logged in
+			System.out.println("not be directed");
 			String approot = getServletContext().getInitParameter("approot");
 			String username = (String)session.getAttribute("username");
 			ServletOutputStream out = response.getOutputStream();
@@ -38,6 +42,7 @@ public class HomeServlet extends HttpServlet {
 			out.println("</html>");
 			out.println(serveHomePage(approot));
 		} else { // user not logged in
+			System.out.println("be redirected");
 			response.sendRedirect("/login"); // send redirect to LoginServlet
 		}
 	}

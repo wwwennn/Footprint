@@ -7,6 +7,8 @@ package db;
 import com.sleepycat.persist.model.*;
 import static com.sleepycat.persist.model.Relationship.*;
 
+import java.util.List;
+
 @Entity
 public class User {
 	@PrimaryKey
@@ -15,6 +17,8 @@ public class User {
 	private String lastname;
 	private String firstname;
 	private String pwd;
+	
+//	private List<String> siteNames; // the keys of the places this user has been to
 	
 	public void setup(String username, String lastname, String firstname, String pwd) {
 		this.username = username;

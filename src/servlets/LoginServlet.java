@@ -39,7 +39,16 @@ public class LoginServlet extends HttpServlet {
 		String pwd = (String)request.getParameter("pwd");
 		DBWrapper wrapper = DBWrapper.getDB(getServletContext().getInitParameter("dbroot"));
 		ServletOutputStream out = response.getOutputStream();
+		
+//		System.out.println(request);
+		System.out.println("Get 'post' a request from login");
+		
 		out.println("<html>");
+		
+//		if("/Wen_Zhong".equals(pathInfo)) {
+//			System.out.println(request.getParameter("name"));
+//		}
+		
 		if ("/register".equals(pathInfo)) { // user tries to register
 			if (wrapper.containsUser(username)) { // already registered
 				out.println("<form action=\"/login\" method=\"get\">" + 
@@ -75,24 +84,61 @@ public class LoginServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String approot = getServletContext().getInitParameter("approot");
+		String pathInfo = request.getPathInfo();
+		DBWrapper wrapper = DBWrapper.getDB(getServletContext().getInitParameter("dbroot"));
 		ServletOutputStream out = response.getOutputStream();
-//		out.println("<html>");
+		System.out.println("Get 'get' a request from login");
+		System.out.println("******************************");
+		System.out.println(pathInfo);
+		System.out.println("******************************");
+		
+		
 //		out.println("<form action=\"/login\" method=\"post\">" +
 //				"User Name: <input type = \"text\" name=\"username\"><br>" +
 //				"Password: <input type = \"text\" name=\"password\"><br>" + 
 //				"<input type = \"submit\" value = \"Login\" > </form>");
 //		FileInputStream in = new FileInputStream("./webpage/index.html");
-		out.println(serveLoginPage(approot));
-//		out.println("</html>");
+		if("/Wen_Zhong".equals(pathInfo)) {
+//			System.out.println("Hahaha");
+//			out.println("<html>");
+//			out.println("<br>you have successfully log in to Facebook!" + request.getPathInfo().substring(1) + "</br>");
+//			out.println("</html>");
+			String firstname = pathInfo.substring(1, pathInfo.lastIndexOf("_"));
+			String lastname = pathInfo.substring(pathInfo.lastIndexOf("_") + 1);
+			String username = wrapper.containsUser(firstname, lastname);
+			if(username != null) {
+				System.out.println("-------------------------");
+				System.out.println("the user is in our database");
+				System.out.println("-------------------------");
+//				response.sendRedirect("/home");
+				HttpSession session = request.getSession();
+				session.setAttribute("username", username);
+//				session.setAttribute("pwd", pwd);
+				response.sendRedirect("/home");
+			} else {
+				System.out.println("the user is not in our database");
+			}
+			response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+			response.setHeader("Pragma","no-cache");
+			out.println("Test!!!!");
+//			response.sendRedirect("/home");
+		} else {
+			out.println(serveLoginPage(approot));
+		}
+		
+//		out.println("<br>you have successfully login in to Facebook!" + request.getPathInfo() + "</br>");
+		
 		return;
 	}
 	
 	private String serveLoginPage(String approot) throws IOException {
+		System.out.println("Enter index");
 		BufferedReader in = new BufferedReader(new FileReader(approot + "/webpage/index.html"));
 		StringBuilder builder = new StringBuilder();
 		String line = in.readLine();
 		while (line != null) {
 			builder.append(line);
+//			System.out.println(line);
 			line = in.readLine();
 		}
 		in.close();

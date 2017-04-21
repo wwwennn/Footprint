@@ -4,7 +4,6 @@
     <title>Simple Map</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -25,15 +24,11 @@
   
     function statusChangeCallback(response) {
       console.log('statusChangeCallback');
+      console.log(response);
       
       if (response.status === 'connected') {
-        FB.api('/me/friends', function (response) {
-          if (response && !response.error) {
-            var test = ['Wen', 'Yan'];
-            console.log(test);
-            console.log(response.data);
-          }
-        }); 
+        
+        testAPI();
       } else {
         
         document.getElementById('status').innerHTML = 'Please log ' +
@@ -49,27 +44,23 @@
     }
 
     window.fbAsyncInit = function() {
-      FB.init({
-        appId      : '1832730586979239',
-        cookie     : true,  
-                            
-        xfbml      : true,  
-        version    : 'v2.8' 
-      });
+    FB.init({
+      appId      : '1832730586979239',
+      cookie     : true,  
+                          
+      xfbml      : true,  
+      version    : 'v2.8' 
+    });
 
-      FB.login(function(response) {
-          console.log("Hello, Wen");
-      }, {
-          scope: 'user_tagged_places,user_friends', 
-          return_scopes: true
-      });
+   
 
-      FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-      });
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+
     };
 
-
+    
     (function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) return;
@@ -80,13 +71,11 @@
 
     
     function testAPI() {
+      console.log('Welcome!  Fetching your information.... ');
       FB.api('/me', function(response) {
-        var req = new XMLHttpRequest();
-        var name = response.name.replace(/ /g,"_");;
-
-        var url = 'http://localhost:8080/login/' + name;
-        req.open('GET', url, true);
-        req.send();
+        console.log('Successful login for: ' + response.name);
+        document.getElementById('status').innerHTML =
+          'Thanks for logging in, ' + response.name + '!';
       });
     }
   </script>
@@ -97,7 +86,12 @@
   the FB.login() function when clicked.
 -->
 
-  
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button>
+
+
+<div id="status">
+</div>
     <div style="height: 450px; width: 700px; margin: 0 auto;" id="map"></div>
     <script>
       var map;
@@ -118,8 +112,7 @@
               <input type="text" name="username" placeholder="Username"><br>
               <input type="password" name="pwd" placeholder="Password"><br>
               <button type="submit">Login</button>  
-            </form>   
-            <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+            </form>    
           </td>
           <td align=center>
             <form action="/login/register" method="POST">

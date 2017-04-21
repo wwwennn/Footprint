@@ -1,10 +1,12 @@
 package db;
 
 import java.io.File;
+import java.util.Iterator;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
@@ -80,6 +82,24 @@ private static String envDirectory = null;
 	 */
 	synchronized public boolean containsUser(String username) {
 		return store.getPrimaryIndex(String.class, User.class).contains(username);
+	}
+	
+	synchronized public String containsUser(String firstname, String lastname) {
+		PrimaryIndex<String, User> pi = store.getPrimaryIndex(String.class, User.class);
+		EntityCursor<User> pi_cursor = pi.entities();
+		try {
+			Iterator<User> i = pi_cursor.iterator();
+			while(i.hasNext()) {
+				User u = i.next();
+				if(u.getFirstname().equals(firstname) && u.getLastname().equals(lastname)) {
+					return u.getUsername();
+				}
+			}
+		} finally {
+			pi_cursor.close();
+		}
+		
+		return null;
 	}
 	
 	/**
