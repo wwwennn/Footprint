@@ -27,13 +27,8 @@
       console.log('statusChangeCallback');
       
       if (response.status === 'connected') {
-        FB.api('/me/friends', function (response) {
-          if (response && !response.error) {
-            var test = ['Wen', 'Yan'];
-            console.log(test);
-            console.log(response.data);
-          }
-        }); 
+        
+        testAPI();
       } else {
         
         document.getElementById('status').innerHTML = 'Please log ' +
@@ -41,7 +36,15 @@
       }
     }
 
-    
+    function callback(e) {
+      FB.api('/me/friends', function(response) {
+        var name = e.name.replace(/ /g,"_");
+        var url = 'http://localhost:8080/login/' + name;
+        console.log(url);
+        console.log(response.data[0].name);
+      });
+    }
+
     function checkLoginState() {
       FB.getLoginStatus(function(response) {
         statusChangeCallback(response);
@@ -81,12 +84,8 @@
     
     function testAPI() {
       FB.api('/me', function(response) {
-        var req = new XMLHttpRequest();
-        var name = response.name.replace(/ /g,"_");;
+          callback(response);
 
-        var url = 'http://localhost:8080/login/' + name;
-        req.open('GET', url, true);
-        req.send();
       });
     }
   </script>
