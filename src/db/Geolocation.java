@@ -15,21 +15,29 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 public class Geolocation {
-	private static DbPut dbPut; 
+	private static DbPut dbPut;
+	
+	private static DBWrapper wrapper = DBWrapper.getDB("/Users/zhongwen/Dropbox/Spring2017/594/project/db");
 	
 	public static void main(String[] args) {
-//		System.out.println("Start...");
+		wrapper.setupStore();
 		ArrayList<String> siteNames = getSitenames();
-//		System.out.println(siteNames.size());
-//		System.out.println("Step1...");
-		dbPut = new DbPut();
-//		System.out.println(siteNames);
+//		dbPut = new DbPut();
 		try {
-//			System.out.println("Step2...");
 			getGeolocation(siteNames);
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+//			DbRead dbRead = new DbRead();
+//			System.out.println("test: " + dbRead.getPlaceInfo("Schuylkill River Park").getSiteName());
+			
+			wrapper.closeStore();
+//			dbPut.closeDB();
 		}
+		
+//		DbRead dbRead = new DbRead();
+//		System.out.println("test: " + dbRead.getPlaceInfo("Schuylkill River Park").getSiteName());
+//		dbPut.closeDB();
 	}
 	
 	private static void getGeolocation(ArrayList<String> siteNames) throws Exception {
@@ -54,14 +62,12 @@ public class Geolocation {
 				response.append(inputLine.trim());
 			}
 			in.close();
-//			System.out.println(response.toString());
 			JSONObject info = parseJson(response.toString());
 			if(info != null) {
 				double latitude = (Double)info.get("lat");
 				double longitude = (Double)info.get("lng");
-	//			System.out.println("latitude: " + latitude);
-	//			System.out.println("longitude: " + longitude);
-				dbPut.insertPlace(siteNames.get(i), latitude, longitude);
+//				dbPut.insertPlace(siteNames.get(i), latitude, longitude);
+				wrapper.putPlace(siteNames.get(i), latitude, longitude);
 			}
 		}
 	}
@@ -95,7 +101,7 @@ public class Geolocation {
 		ArrayList<String> res = new ArrayList<>();
 		Scanner in = null;
 		try {
-			in = new Scanner(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/data/PPR_Assets.csv"));
+			in = new Scanner(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/data/PPR_Assets copy.csv"));
 			
 			while(in.hasNextLine()) {
 				res.add(in.nextLine());

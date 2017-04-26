@@ -1,6 +1,7 @@
 package db;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.sleepycat.je.DatabaseException;
@@ -17,7 +18,7 @@ import com.sleepycat.persist.StoreConfig;
  */
 public class DBWrapper {
 	
-private static String envDirectory = null;
+	private static String envDirectory = null;
 	
 	private static Environment myEnv;
 	private static EntityStore store;
@@ -75,6 +76,49 @@ private static String envDirectory = null;
 		myEnv.sync();
 	}
 	
+	public void putPlace(String siteName, double latitude, double longitude) throws Exception {
+		Place newPlace = new Place();
+		newPlace.setSiteName(siteName);
+		newPlace.setLat(latitude);
+		newPlace.setLon(longitude);
+		PrimaryIndex<String, Place> primaryIndex = store.getPrimaryIndex(String.class, Place.class);
+		primaryIndex.put(newPlace);
+		store.sync();
+		myEnv.sync();
+	}
+	
+	synchronized public ArrayList<String> getSearchPlaces(String searchKey) {
+		ArrayList<String> res = new ArrayList<String>();
+		PrimaryIndex<String, Place> pi = store.getPrimaryIndex(String.class, Place.class);
+		EntityCursor<Place> pi_cursor = pi.entities();
+		
+		try {
+			System.out.println("using iterator...");
+//			Iterator<Place> i = pi_cursor.iterator();
+//			while(i.hasNext()) {
+//				System.out.println("enter here");
+//				Place p = i.next();
+//				System.out.println("site: " + p.getSiteName());
+//				if(p.getSiteName().toLowerCase().contains(searchKey)) {
+//					res.add(p.getSiteName());
+//				}
+//			}
+			for(Place p : pi_cursor) {
+				System.out.println("enter for loop");
+				if(p.getSiteName().toLowerCase().contains(searchKey)) {
+					res.add(p.getSiteName());
+				}
+			}
+			System.out.println("over");
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			pi_cursor.close();
+		}
+		
+		return res;
+	}
+	
 	/**
 	 * Check if the database contains a specified User.
 	 * @param username of the User.
@@ -109,6 +153,9 @@ private static String envDirectory = null;
 	 */
 	synchronized public User getUser(String username) {
 		return store.getPrimaryIndex(String.class, User.class).get(username);
+	}
+	synchronized public Place getPlace(String placename) {
+		return store.getPrimaryIndex(String.class, Place.class).get(placename);
 	}
 	
 	/**

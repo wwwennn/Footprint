@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+  </head>
+  <body>
+  <script>
+
+  	function setLocation() {
+  		console.log("call setLocation");
+  		window.location = 'http://localhost:8080/home';
+  	}
+  
+    function callback(e, setLocation) {
+      FB.api('/me/friends', function(response) {
+        var req = new XMLHttpRequest();
+        var name = e.name.replace(/ /g,"_");
+        var url = 'http://localhost:8080/login/' + name;
+        console.log(url);
+        console.log(response.data[0].name);
+        req.open('GET', url, true);
+        req.send();
+        console.log("call callback");
+        setLocation();
+      });
+    }
+
+    function statusChangeCallback(response) {
+      console.log('statusChangeCallback');
+      console.log(response);
+      
+      if (response.status === 'connected') {
+      }
+    }
+
+    function logout() {
+  		FB.logout(function(response) {
+   			
+		});
+		console.log('person is now logged out');
+  	}
+
+    function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    }
+
+    window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1832730586979239',
+      cookie     : true,  
+                          
+      xfbml      : true,  
+      version    : 'v2.8' 
+    });
+
+   
+
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+
+    };
+
+    
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
+
+  <form action="/home/logout" method="get">
+  	<button type="submit" onclick="return logout()">Logout</button>
+  </form>
+  </body>
+</html>

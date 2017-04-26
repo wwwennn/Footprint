@@ -17,6 +17,11 @@ public class DbEnv {
 		
 	}
 	
+	public void flushBuffer() {
+		store.sync();
+		env.sync();
+	}
+	
 	public void setup(File envHome, boolean readOnly) throws DatabaseException {
 		EnvironmentConfig envConfig = new EnvironmentConfig();
 		StoreConfig storeConfig = new StoreConfig();

@@ -29,6 +29,8 @@ public class DbPut {
 		newPlace.setLon(longitude);
 		
 		da.placeBySiteName.put(newPlace);
+		env.flushBuffer();
+		System.out.println("put a location: " + newPlace.getSiteName());
 	}
 	
 	public void insertUser(String username, String firstname, String lastname, String pwd) throws Exception {
@@ -39,6 +41,7 @@ public class DbPut {
 		newUser.setPwd(pwd);
 		
 		da.userByUsername.put(newUser);
+		env.flushBuffer();
 	}
 	
 	public void insertFootprint(String username, String siteName) throws Exception {
@@ -47,5 +50,10 @@ public class DbPut {
 		newFP.setUsername(username);
 		
 		da.footprintPInd.put(newFP);
+		env.flushBuffer();
+	}
+	
+	public void closeDB() {
+		env.close();
 	}
 }

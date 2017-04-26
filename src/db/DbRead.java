@@ -16,7 +16,7 @@ public class DbRead {
 	
 	public DbRead() {
 		dbEnv = new DbEnv();
-		dbEnv.setup(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/db"), true);
+		dbEnv.setup(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/db"), false);
 		da = new DataAccessor(dbEnv.getEntityStore());
 	}
 	
