@@ -2,6 +2,7 @@ package db;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import com.sleepycat.je.DatabaseException;
@@ -93,23 +94,11 @@ public class DBWrapper {
 		EntityCursor<Place> pi_cursor = pi.entities();
 		
 		try {
-			System.out.println("using iterator...");
-//			Iterator<Place> i = pi_cursor.iterator();
-//			while(i.hasNext()) {
-//				System.out.println("enter here");
-//				Place p = i.next();
-//				System.out.println("site: " + p.getSiteName());
-//				if(p.getSiteName().toLowerCase().contains(searchKey)) {
-//					res.add(p.getSiteName());
-//				}
-//			}
 			for(Place p : pi_cursor) {
-				System.out.println("enter for loop");
 				if(p.getSiteName().toLowerCase().contains(searchKey)) {
 					res.add(p.getSiteName());
 				}
 			}
-			System.out.println("over");
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -119,6 +108,11 @@ public class DBWrapper {
 		return res;
 	}
 	
+	synchronized public HashSet<String> getUserPlaces(String username) {
+		PrimaryIndex<String, User> pi = store.getPrimaryIndex(String.class, User.class);
+		return pi.get(username).getSiteNames();
+	}
+	
 	/**
 	 * Check if the database contains a specified User.
 	 * @param username of the User.
@@ -126,6 +120,20 @@ public class DBWrapper {
 	 */
 	synchronized public boolean containsUser(String username) {
 		return store.getPrimaryIndex(String.class, User.class).contains(username);
+	}
+	
+	synchronized public void addPlacesToUser(String username, ArrayList<String> places) {
+		PrimaryIndex<String, User> pi = store.getPrimaryIndex(String.class, User.class);
+		User temp = pi.get(username);
+		temp.addPlaces(places);
+		pi.put(temp);
+		store.sync();
+		myEnv.sync();
+//		HashSet<String> temp = pi.get(username).getSiteNames();
+//		System.out.println("Let's see...");
+//		for(String str:temp) {
+//			System.out.println("user has visited " + str);
+//		}
 	}
 	
 	synchronized public String containsUser(String firstname, String lastname) {
@@ -154,6 +162,16 @@ public class DBWrapper {
 	synchronized public User getUser(String username) {
 		return store.getPrimaryIndex(String.class, User.class).get(username);
 	}
+	
+	synchronized public void deletePlaceFromUser(String username, String placename) {
+		PrimaryIndex<String, User> pi = store.getPrimaryIndex(String.class, User.class);
+		User u = pi.get(username);
+		u.deletePlace(placename);
+		pi.put(u);
+		store.sync();
+		myEnv.sync();
+	}
+	
 	synchronized public Place getPlace(String placename) {
 		return store.getPrimaryIndex(String.class, Place.class).get(placename);
 	}

@@ -22,22 +22,13 @@ public class Geolocation {
 	public static void main(String[] args) {
 		wrapper.setupStore();
 		ArrayList<String> siteNames = getSitenames();
-//		dbPut = new DbPut();
 		try {
 			getGeolocation(siteNames);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-//			DbRead dbRead = new DbRead();
-//			System.out.println("test: " + dbRead.getPlaceInfo("Schuylkill River Park").getSiteName());
-			
+		} finally {			
 			wrapper.closeStore();
-//			dbPut.closeDB();
 		}
-		
-//		DbRead dbRead = new DbRead();
-//		System.out.println("test: " + dbRead.getPlaceInfo("Schuylkill River Park").getSiteName());
-//		dbPut.closeDB();
 	}
 	
 	private static void getGeolocation(ArrayList<String> siteNames) throws Exception {
@@ -101,7 +92,7 @@ public class Geolocation {
 		ArrayList<String> res = new ArrayList<>();
 		Scanner in = null;
 		try {
-			in = new Scanner(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/data/PPR_Assets copy.csv"));
+			in = new Scanner(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/data/PPR_Assets.csv"));
 			
 			while(in.hasNextLine()) {
 				res.add(in.nextLine());

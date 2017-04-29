@@ -3,7 +3,10 @@ package servlets;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -12,7 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import com.google.gson.Gson;
+
 import db.DBWrapper;
+import intermediate.FacebookUser;
+import intermediate.HtmlDealer;
 
 /**
  * This is the landing page.
@@ -20,6 +31,9 @@ import db.DBWrapper;
  */
 @SuppressWarnings("serial")
 public class HomeServlet extends HttpServlet {
+	ArrayList<String> items = new ArrayList<String>();
+	StringBuilder webPage = new StringBuilder();
+	HtmlDealer dealer;
 	
 	@Override
 	public void init() throws ServletException {
@@ -37,41 +51,73 @@ public class HomeServlet extends HttpServlet {
 		wrapper.closeStore();
 	}
 	
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String pathinfo = request.getPathInfo();
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		DBWrapper wrapper = DBWrapper.getDB(getServletContext().getInitParameter("dbroot"));
-
+		String pathinfo = request.getPathInfo();
+		
+		System.out.println("pathinfo: " + pathinfo);
+		HttpSession session = request.getSession(false);
+		if("/add".equals(pathinfo)) {
+			String json = request.getParameter("items");
+			ArrayList<String> itemsToBeAdded = parseJson(json);
+			ArrayList<String> newItems = new ArrayList<String>();
+			for(int i = 0; i < itemsToBeAdded.size(); i++) {
+				String temp = itemsToBeAdded.get(i);
+				temp = temp.replace('-', ' ');
+				newItems.add(temp.trim());
+			}
+			
+			String username = (String)session.getAttribute("username");
+			wrapper.addPlacesToUser(username, newItems);
+			HashSet<String> allPlaces = wrapper.getUserPlaces(username);
+			// return newItems back to ajax
+			response.setContentType("application/json");
+			new Gson().toJson(allPlaces, response.getWriter());
+			return;
+		}
+		
+		if("/search".equals(pathinfo)) {
+			String searchKey = request.getParameter("searchKey");
+			ArrayList<String> siteNames = wrapper.getSearchPlaces(searchKey.toLowerCase());
+			response.setContentType("application/json");
+			new Gson().toJson(siteNames, response.getWriter());
+			return;
+		}
+		
+	}
+	
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		DBWrapper wrapper = DBWrapper.getDB(getServletContext().getInitParameter("dbroot"));
+		String pathinfo = request.getPathInfo();
+		
+		HashSet<String> test = wrapper.getUserPlaces("wen123");
+		System.out.println("wen123 places: ");
+		for(String str:test) {
+			System.out.println(str);
+		}
+		String approot = getServletContext().getInitParameter("approot");
+		dealer = new HtmlDealer(approot + "/webpage/home.html");
 		if ("/logout".equals(pathinfo)) {
 			request.getSession().invalidate();
 			response.sendRedirect("/home");
 			return;
 		}
 		
-		if("/search".equals(pathinfo)) {
-			String searchKey = request.getParameter("searchKey");
-			System.out.println("The search key is: " + searchKey);
-			
-			if(wrapper != null) { 
-				ArrayList<String> siteNames = wrapper.getSearchPlaces(searchKey.toLowerCase());
-				// TODO get the result of search
-				System.out.println(siteNames);
-			}
-		}
 		
 		HttpSession session = request.getSession(false);
 
 		if (session != null) { // user logged in
-			System.out.println("Session is not null");
-			String approot = getServletContext().getInitParameter("approot");
-			String username = (String)session.getAttribute("username");
 			String firstname = (String)session.getAttribute("firstname");
+			String username = (String)session.getAttribute("username");
 			ServletOutputStream out = response.getOutputStream();
-			System.out.println("approot:" + approot);
-			StringBuilder webPage = serveHomePage(approot);
-			webPage = addUserName(webPage, firstname);
+			HashSet<String> visitedPlaces = wrapper.getUserPlaces(username);
+
+			if(visitedPlaces != null) {
+				webPage = dealer.serveHomePageWithName(approot + "/webpage/home.html", firstname, visitedPlaces);
+			}
 			if(session.getAttribute("friends") != null) {
 				ArrayList<String> friends = (ArrayList<String>)session.getAttribute("friends");
-				webPage = addFriends(webPage, friends);
+				webPage = dealer.addFriends(webPage, friends);
 			}
 			out.println(webPage.toString());
 		} else { // user not logged in
@@ -80,49 +126,34 @@ public class HomeServlet extends HttpServlet {
 		
 	}
 	
-	/**
-	 * add user's friends to the html string
-	 * @param webPage the whole web page
-	 * @param friends the friends' list
-	 * @return a html string with user's friends' names
-	 */
-	private StringBuilder addFriends(StringBuilder webPage, ArrayList<String> friends) {
-		int startIndex = webPage.indexOf("Mark");
-		for(int i = 0; i < friends.size(); i++) {
-			webPage.replace(startIndex, startIndex + 4, "<p>" + friends.get(i) + "</p>");
+	public void doDelete(HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("item to be deleted is " + request.getPathInfo());
+		String item = request.getPathInfo().substring(1).replace('-', ' ');
+		items.add(item);
+	}
+	
+	private ArrayList<String> parseJson(String json) {
+		try {
+			JSONParser parser = new JSONParser();
+			Object obj = parser.parse(json);
+			if(obj != null) {
+				JSONArray items = (JSONArray)obj;
+				if(items != null) {
+					ArrayList<String> res = new ArrayList<String>();
+					Iterator<String> iterator = items.iterator();
+					while(iterator.hasNext()) {
+						res.add(iterator.next());
+					}
+					return res;
+				}
+				
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 		
-		return webPage;
-	}
-	
-	/**
-	 * add the user's name to the returned html file
-	 * @param webPage the whole web page
-	 * @param name user's first name
-	 * @return a html string with user's first name
-	 */
-	private StringBuilder addUserName(StringBuilder webPage, String name) {
-		int index = webPage.indexOf("Welcome");
-		webPage.insert(index + 7, ", " + name);
-		return webPage;
-	}
-	
-	/**
-	 * read home.html
-	 * @param approot: file path
-	 * @return a string which contains the file
-	 * @throws IOException
-	 */
-	private StringBuilder serveHomePage(String approot) throws IOException {
-		BufferedReader in = new BufferedReader(new FileReader(approot + "/webpage/home.html"));
-		StringBuilder builder = new StringBuilder();
-		String line = in.readLine();
-		while (line != null) {
-			builder.append(line);
-			line = in.readLine();
-		}
-		in.close();
-		return builder;
-	}
+		return null;
+	}	
 
 }

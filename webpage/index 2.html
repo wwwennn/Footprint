@@ -31,6 +31,32 @@
 </head>
 
 <body>
+    <script type='text/javascript'>
+//get scroll position
+var get_scroll = function(){
+    var x = 0, y = 0;
+    if( typeof( window.pageYOffset ) == 'number' ) {
+        //Netscape compliant
+        y = window.pageYOffset;
+        x = window.pageXOffset;
+    } else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ) {
+        //DOM compliant
+        y = document.body.scrollTop;
+        x = document.body.scrollLeft;
+    } else if( document.documentElement && 
+    ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ) {
+        //IE6 standards compliant mode
+        y = document.documentElement.scrollTop;
+        x = document.documentElement.scrollLeft;
+    }
+    var obj = new Object();
+    obj.x = x;
+    obj.y = y;
+    return obj;
+};
+</script>
+<input type='button' value='Get scroll position' 
+    onclick='var scroll = get_scroll(); alert(scroll.x + "x and " + scroll.y + "y")'/>
 
     <div class="brand">Business Casual</div>
     <div class="address-bar">3481 Melrose Place | Beverly Hills, CA 90210 | 123.456.7890</div>

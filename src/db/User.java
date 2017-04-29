@@ -7,7 +7,8 @@ package db;
 import com.sleepycat.persist.model.*;
 import static com.sleepycat.persist.model.Relationship.*;
 
-import java.util.List;
+import java.util.*;
+
 
 @Entity
 public class User {
@@ -18,13 +19,15 @@ public class User {
 	private String firstname;
 	private String pwd;
 	
-//	private List<String> siteNames; // the keys of the places this user has been to
+//	private ArrayList<String> siteNames; // the keys of the places this user has been to
+	private HashSet<String> siteNames;
 	
 	public void setup(String username, String lastname, String firstname, String pwd) {
 		this.username = username;
 		this.lastname = lastname;
 		this.firstname = firstname;
 		this.pwd = pwd;
+		siteNames = new HashSet<String>();
 	}
 	
 	public String getUsername() {
@@ -32,6 +35,14 @@ public class User {
 	}
 	
 	
+	public HashSet<String> getSiteNames() {
+		return siteNames;
+	}
+
+	public void setSiteNames(HashSet<String> siteNames) {
+		this.siteNames = siteNames;
+	}
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -66,4 +77,12 @@ public class User {
 		this.pwd = pwd;
 	}
 	
+	public void addPlaces(ArrayList<String> places) {
+		System.out.println("try to add things");
+		siteNames.addAll(places);
+	}
+	
+	public void deletePlace(String place) {
+		siteNames.remove(place);
+	}
 }

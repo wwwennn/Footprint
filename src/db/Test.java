@@ -1,6 +1,8 @@
 package db;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.persist.EntityCursor;
@@ -11,27 +13,17 @@ import com.sleepycat.persist.EntityCursor;
 */
 
 public class Test {
-	private static File myDbEnvPath = new File("/Users/zhongwen/Dropbox/Spring2017/594/project/db");
-	private static DataAccessor da;
-	private static DbEnv myDbEnv = new DbEnv();
-	
 	public static void main(String[] args) {
-		DbRead read = new DbRead();
-		try {
-			myDbEnv.setup(myDbEnvPath, true);
-			da = new DataAccessor(myDbEnv.getEntityStore());
-			EntityCursor<Place> places = da.placeBySiteName.entities();
-			for(Place p : places) {
-				if(p.getSiteName().toLowerCase().contains("park"))
-					System.out.println(p.getSiteName() + ": latitude: " + p.getLat() + " longitude: " + p.getLon());
-			}
-			places.close();
-		} catch(DatabaseException dbe) {
-			System.err.println("ExampleInventoryRead: " + dbe.toString());
-	        dbe.printStackTrace();
-		} finally {
-			myDbEnv.close();
+		DBWrapper wrapper = DBWrapper.getDB("/Users/zhongwen/Dropbox/Spring2017/594/project/db");
+		wrapper.setupStore();
+		ArrayList<String> temp = new ArrayList<String>();
+		temp.add("Laura Sims Rink");
+		temp.add("Rizzo Ice Rink");
+		wrapper.addPlacesToUser("wen123", temp);
+		HashSet<String> places = wrapper.getUserPlaces("wen123");
+		for(String str : places) {
+			System.out.println(str);
 		}
-		System.out.println("All done.");
+		wrapper.closeStore();
 	}
 }

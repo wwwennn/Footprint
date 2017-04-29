@@ -12,17 +12,20 @@
     <title>Footprint</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="css/business-casual.css" rel="stylesheet">
+    <link href="../css/business-casual.css" rel="stylesheet">
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
 
-    <!-- Javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -31,10 +34,134 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <style>
+      .addSection{
+          list-style-type: none;
+          padding: 0;
+          margin: 0;
+      }
+
+      .addSection li{
+          width: 100%;
+          padding: 20px;
+          box-sizing: border-box;
+          font-size: 18px;
+          cursor: pointer;
+          letter-spacing: 1px;
+      }
+
+      .addSection li:hover{
+          text-decoration: underline;
+          background: rgba(0,0,0,0.2);
+      }
+
+      .currentFP{
+          list-style-type: none;
+          padding: 0;
+          margin: 0;
+          height: 350px;
+          overflow: scroll;
+      }
+
+      .currentFP li{
+          width: 100%;
+          padding: 20px;
+          box-sizing: border-box;
+          font-size: 18px;
+          letter-spacing: 1px;
+      }
+
+      .currentFP li:hover{
+          background: rgba(0,0,0,0.2);
+      }
+    </style>
+
 </head>
 
 <body>
     <script>
+    $(function(){
+
+
+      /* places to be added to user's footprints, no duplicate elements in it */
+
+      /* toBeAddedLi is the class of li in the ul with id container, if it is clicked, it should disappear */
+      $('#container').on('click', '.toBeAddedLi', function (){
+          $(this).closest("li").remove();
+      });
+
+
+      /* searchBtn is the id of the search button, if it is clicked */
+      $("#searchBtn").on('click', function(){
+
+        $('#searchResult').load('http://localhost:8080/home/search', {"searchKey": $('#searchKey').val()}, function(data){
+          $('#searchResult').height("300px");
+          $('#container').height("300px");
+          $(this).empty();
+          var arr = JSON.parse(data);
+
+          
+          for(var i = 0; i < arr.length; i++) {
+            var curHtml = $(this).html();
+            $(this).html(curHtml + '<li class="searchResultLi">' + arr[i] + '</li>');
+
+            $('.searchResultLi').on('click', function(){
+  	      	  var item = $(this).text().replace(/ /g, "-");
+  	      	  var addedItem = $('#container').html();
+  	      	  if(addedItem.indexOf($(this).text()) === -1) {
+  	            $('#container').html(addedItem + '<li  class="toBeAddedLi">' + $(this).text() + '</li>');
+  	            $('#container').scrollTop($('#container').prop("scrollHeight"));
+  	      	  }
+		        });
+          }
+
+          $('#addItemBtn').on('click', function(){
+        	var addedItems=[];
+        	var tempArr=$('.toBeAddedLi').toArray();
+        	for(var i=0; i < tempArr.length; i++) {
+        		addedItems.push( tempArr[i].innerHTML);
+        	}
+            $.ajax({
+              url: 'http://localhost:8080/home/add',
+              type: 'POST', 
+              data: {"items": JSON.stringify(addedItems)},
+              success: function(data) {
+                console.log('SUCCESS');
+                $('#guidance').html('Add successfully!');
+                $('#container').empty();
+                console.log(data);
+                
+                var tempStr="";
+                for(var i = 0; i < data.length; i++) {
+                	tempStr = tempStr + "<li>" + data[i] + "</li>";
+                }
+                $('#currentFPDiv').html("<ul class='currentFP'>" + tempStr + "</ul><a href='http://localhost:8080/blog#manageFPTle' class='btn btn-default' id='manageFP'>Manage Your Footprints</a>");
+
+
+              }
+            });
+          });
+
+        }); 
+
+
+
+      });
+
+
+      $("#manageFP").click(function(){
+        $.ajax({
+          url: "http://localhost:8080/blog",
+          type: 'GET',
+          success: function(res) {
+            window.location="http://localhost:8080/blog";
+          }
+        });
+      });      
+      
+
+
+    });
 
     function setLocation() {
       console.log("call setLocation");
@@ -106,6 +233,41 @@
     <div class="brand">Footprint</div>
     <div class="address-bar">Enjoy your life on your way</div>
 
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <!-- navbar-brand is hidden on larger screens, but visible when the menu is collapsed -->
+                <a class="navbar-brand" href="index.html">Business Casual</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="http://localhost:8080/home">Home</a>
+                    </li>
+                    <li>
+                        <a href="http://localhost:8080/blog">Blog</a>
+                    </li>
+                    <li>
+                        <a href="http://localhost:8080/explore?q=philadelphia">Explore</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+
     <div class="container">
 
         <div class="row">
@@ -143,7 +305,11 @@
                     </h2>
                     <hr>
                 </div>
-                <div class="col-lg-12 text-center">
+                <div class="col-lg-6 text-center" id="currentFPDiv">
+                Oops, you have not marked any places...
+                
+                </div>
+                <div class="col-lg-6 text-center">
                     <!-- Embedded Google Map using an iframe - to select your location find it on Google maps and paste the link as the iframe src. If you want to use the Google Maps API instead then have at it! -->
                     <div style="height: 400px; margin: 0 auto;" id="map"></div>
                     <script>
@@ -157,6 +323,7 @@
                     </script>
                     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQpPuKYTaXyE4FF6aMS6FFC6LFysc2JzI&callback=initMap"
                     async defer></script>
+                    <div class="clearfix"></div>
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -164,23 +331,38 @@
 
         <div class="row">
             <div class="box">
-                <div class="col-lg-12">
+                <div class="col-lg-6">
                     <hr>
-                    <h2 class="intro-text text-center">Add
+                    <h2 class="intro-text text-center" id="addPlace">Add
                         <strong>a new footprint</strong>
                     </h2>
                     <hr>
-                    <form role="form" action="/home/search" method="GET">
-                        <div class="form-group col-lg-4 text-right">
-                          <input type="hidden">
-                        </div>
-                        <div class="form-group col-lg-3 text-right">
-                            <input type="text" class="form-control" name="searchKey">
-                        </div>
-                        <div class="form-group col-lg-4 text-left">
-                        <button type="submit" class="btn btn-default">Search</button>
-                        </div>
-                    </form>
+                    <div class="form-group col-lg-2 text-right">
+                      <input type="hidden">
+                    </div>
+                    <div class="form-group col-lg-5 text-center">
+                      <input type="text" class="form-control" id="searchKey">
+                    </div>
+                    <div class="form-group col-lg-4 text-left">
+                      <button type="submit" class="btn btn-default" id="searchBtn">Search</button>
+                    </div>
+                    <div class="clearfix"></div>
+                    <ul id="searchResult" style="overflow: scroll;" class="addSection">
+                    </ul>
+                </div>
+                <div class="col-lg-6">
+                    <hr>
+                    <h2 class="intro-text text-center">Places
+                        <strong>to be added</strong>
+                    </h2>
+                    <hr>
+                    <div class="col-md-12">
+                      <h6 class="text-center" id="guidance">You can search places on the left and then add them here</h6>
+                      <ul id="container" style="overflow: scroll;" class="addSection"></ul>
+                      <div class="text-center">
+                      <button type="submit" class="btn btn-default" id="addItemBtn">Add</button>
+                      </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -194,7 +376,7 @@
                     </h2>
                     <hr>
                     <div class="col-md-12">
-                      Mark
+                      This function is only for Facebook users. You can login with your Facebook account to explore it.
                     </div>
                 </div>
             </div>
@@ -213,11 +395,7 @@
         </div>
     </footer>
 
-    <!-- jQuery -->
-    <script src="js/jquery.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+    
 
 </body>
 
