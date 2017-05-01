@@ -12,11 +12,14 @@ import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
+import com.sleepycat.persist.model.Persistent;
 
 /**
  * This class provides all operations on the database.
  *
  */
+
+@Persistent
 public class DBWrapper {
 	
 	private static String envDirectory = null;
@@ -129,11 +132,6 @@ public class DBWrapper {
 		pi.put(temp);
 		store.sync();
 		myEnv.sync();
-//		HashSet<String> temp = pi.get(username).getSiteNames();
-//		System.out.println("Let's see...");
-//		for(String str:temp) {
-//			System.out.println("user has visited " + str);
-//		}
 	}
 	
 	synchronized public String containsUser(String firstname, String lastname) {
@@ -174,6 +172,21 @@ public class DBWrapper {
 	
 	synchronized public Place getPlace(String placename) {
 		return store.getPrimaryIndex(String.class, Place.class).get(placename);
+	}
+	
+	synchronized public void addBlogToUser(String username, Blog blog) {
+		PrimaryIndex<String, User> pi = store.getPrimaryIndex(String.class, User.class);
+		User u = pi.get(username);
+		u.addBlog(blog);
+		pi.put(u);
+		store.sync();
+		myEnv.sync();
+	}
+	
+	public ArrayList<Blog> getUserBlogs(String username) {
+		PrimaryIndex<String, User> pi = store.getPrimaryIndex(String.class, User.class);
+		User u = pi.get(username);
+		return u.getArticles();
 	}
 	
 	/**

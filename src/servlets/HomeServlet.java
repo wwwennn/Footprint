@@ -55,7 +55,6 @@ public class HomeServlet extends HttpServlet {
 		DBWrapper wrapper = DBWrapper.getDB(getServletContext().getInitParameter("dbroot"));
 		String pathinfo = request.getPathInfo();
 		
-		System.out.println("pathinfo: " + pathinfo);
 		HttpSession session = request.getSession(false);
 		if("/add".equals(pathinfo)) {
 			String json = request.getParameter("items");
@@ -90,11 +89,7 @@ public class HomeServlet extends HttpServlet {
 		DBWrapper wrapper = DBWrapper.getDB(getServletContext().getInitParameter("dbroot"));
 		String pathinfo = request.getPathInfo();
 		
-		HashSet<String> test = wrapper.getUserPlaces("wen123");
-		System.out.println("wen123 places: ");
-		for(String str:test) {
-			System.out.println(str);
-		}
+		
 		String approot = getServletContext().getInitParameter("approot");
 		dealer = new HtmlDealer(approot + "/webpage/home.html");
 		if ("/logout".equals(pathinfo)) {
@@ -127,7 +122,6 @@ public class HomeServlet extends HttpServlet {
 	}
 	
 	public void doDelete(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("item to be deleted is " + request.getPathInfo());
 		String item = request.getPathInfo().substring(1).replace('-', ' ');
 		items.add(item);
 	}

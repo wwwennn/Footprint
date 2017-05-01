@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import db.Blog;
+
 /**
 *
 * @author Wen Zhong
@@ -120,5 +122,23 @@ public class HtmlDealer {
 		this.webPage = webPage;
 	}
 	
-	
+	public StringBuilder addArticle(StringBuilder page, Blog blog) {
+		int titleIdx = page.indexOf("Title");
+		page.replace(titleIdx, titleIdx + "Title".length(), blog.getTitle());
+		int timeIdx = page.indexOf("Timestamp");
+		page.replace(timeIdx, timeIdx + "Timestamp".length(), blog.getTimestamp());
+		int imgIdx = page.indexOf("imagePath");
+		String imagePath = blog.getImagePath();
+		if(blog.getImagePath().length() == 0) {
+			imagePath = "img/default.png";
+		} else {
+			int idx=imagePath.indexOf("blogImg");
+            imagePath=imagePath.substring(idx);
+		}
+		page.replace(imgIdx, imgIdx + "imagePath".length(), imagePath);
+		int contentIdx = page.indexOf("Content");
+		page.replace(contentIdx, contentIdx + "Content".length(), blog.getContent());
+		
+		return page;
+	}
 }

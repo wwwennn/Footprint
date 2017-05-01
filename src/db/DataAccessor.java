@@ -15,8 +15,6 @@ public class DataAccessor {
 		
 		userByUsername = store.getPrimaryIndex(String.class, User.class);
 		
-		footprintPInd = store.getPrimaryIndex(Long.class, Footprint.class);
-		footprintSInd = store.getSecondaryIndex(footprintPInd, String.class, "username");
 	}
 	
 	// Place Accessors
@@ -24,8 +22,5 @@ public class DataAccessor {
 	
 	// User Accessors
 	PrimaryIndex<String, User> userByUsername;
-	
-	// Footprint Accessors
-	PrimaryIndex<Long, Footprint> footprintPInd;
-	SecondaryIndex<String, Long, Footprint> footprintSInd;
+
 }

@@ -56,6 +56,8 @@
           text-decoration: line-through;
           background: rgba(0,0,0,0.2);
         }
+
+        
     </style>
 
 </head>
@@ -67,6 +69,8 @@
          
 
         $(function(){
+            var arr;
+            var counter = 0;
             
 
             $('.manageSection li').click(function (){
@@ -76,7 +80,107 @@
 
             });
 
+            $('#blogList').load('http://localhost:8080/blog/articles', function(data){
+                arr = JSON.parse(data);
+                if(arr.length!==0) {
+                    $('#noneArticle').html("");
+                }
+                var addedHTML='';
+                for(var i=counter*4+1; i<=counter*4+4 && i-1<arr.length; i++) {
+                    var imagePath=arr[i-1].imagePath;
+                    if(imagePath.length === 0) {
+                        imagePath="img/default.png";
+                    } else {
+                        var idx=imagePath.indexOf("blogImg");
+                        imagePath=imagePath.substring(idx);
+                    }
+                    var content=arr[i-1].content;
+                    addedHTML = addedHTML + '<div class="col-md-6 text-center"><img class="img-responsive img-border img-full" src="'+imagePath+'" alt="" style="width:525px;height:293px;"><h2>'+arr[i-1].title+'<br><small>'+arr[i-1].timestamp+'</small></h2><p>'+content.substring(0, Math.min(100, content.length))+'</p><a class="btn btn-default btn-lg" href="http://localhost:8080/article?article='+arr[i-1].title+'&timestamp='+arr[i-1].timestamp+'">Read More</a><hr></div>';
+                    if(i%2 === 0) {
+                        addedHTML = addedHTML + '<div class="clearfix"></div>';
+                    }
+                    
+                }
+                
+                if(arr.length > 4) {
+                    $('.previous').html("");
+                    $('.next').html("");
+                    if(counter!==0) {
+                        $('.previous').html("<button class='btn btn-default'>&larr; Older</button>");
+                    }
+                    if(counter*4+4<=arr.length) {
+                        $('.next').html("<button class='btn btn-default'>Newer &rarr;</button>");
+                    }
+                }
+                $(this).html(addedHTML);
+            });
 
+            $('.next').on('click', function(){
+                $('#blogList').html("");
+                var addedHTML='';
+                counter++;
+                for(var i=counter*4+1; i<=counter*4+4 && i-1<arr.length; i++) {
+                    var imagePath=arr[i-1].imagePath;
+                    if(imagePath.length === 0) {
+                        imagePath="img/default.png";
+                    } else {
+                        var idx=imagePath.indexOf("blogImg");
+                        imagePath=imagePath.substring(idx);
+                    }
+                    var content=arr[i-1].content;
+                    addedHTML = addedHTML + '<div class="col-md-6 text-center"><img class="img-responsive img-border img-full" src="'+imagePath+'" alt="" style="width:525px;height:293px;"><h2>'+arr[i-1].title+'<br><small>'+arr[i-1].timestamp+'</small></h2><p>'+content.substring(0, Math.min(100, content.length))+'</p><a class="btn btn-default btn-lg" href="http://localhost:8080/article?article='+arr[i-1].title+'&timestamp='+arr[i-1].timestamp+'">Read More</a><hr></div>';
+                }
+                if(arr.length > 4) {
+                    $('.previous').html("");
+                    $('.next').html("");
+                    if(counter!==0) {
+                        $('.previous').html("<button class='btn btn-default'>&larr; Older</button>");
+                    }
+                    if(counter*4+4<=arr.length) {
+                        $('.next').html("<button class='btn btn-default'>Newer &rarr;</button>");
+                    }
+                }
+                $('#blogList').html(addedHTML);
+            });
+
+            $('.previous').on('click', function(){
+                var addedHTML='';
+                counter--;
+                for(var i=counter*4+1; i<=counter*4+4; i++) {
+                    var imagePath=arr[i-1].imagePath;
+                    if(imagePath.length === 0) {
+                        imagePath="img/default.png";
+                    } else {
+                        var idx=imagePath.indexOf("blogImg");
+                        imagePath=imagePath.substring(idx);
+                    }
+                    var content=arr[i-1].content;
+                    addedHTML = addedHTML + '<div class="col-md-6 text-center"><img class="img-responsive img-border img-full" src="'+imagePath+'" alt="" style="width:525px;height:293px;"><h2>'+arr[i-1].title+'<br><small>'+arr[i-1].timestamp+'</small></h2><p>'+content.substring(0, Math.min(100, content.length))+'</p><a class="btn btn-default btn-lg" href="http://localhost:8080/article?article='+arr[i-1].title+'&timestamp='+arr[i-1].timestamp+'">Read More</a><hr></div>';
+                }
+                if(arr.length > 4) {
+                    $('.previous').html("");
+                    $('.next').html("");
+                    if(counter!==0) {
+                        $('.previous').html("<button class='btn btn-default'>&larr; Older</button>");
+                    }
+                    if(counter*4+4<=arr.length) {
+                        $('.next').html("<button class='btn btn-default'>Newer &rarr;</button>");
+                    }
+                }
+                $('#blogList').html(addedHTML);
+            });
+
+            $('div').on('click', '.readMore', function(){
+                $.ajax({
+                    url: 'http://localhost:8080/article',
+                    type: 'POST', 
+                    data: {"article": $(this).attr('id')},
+                    success: function(data) {
+                                      
+                    }
+                });
+                console.log($(this).attr('id'));
+            });
 
         });
 
@@ -154,42 +258,16 @@
                     <hr>
                     <a href="http://localhost:8080/blog/create" class="btn btn-default">Write A New Article</a>
                 </div>
-                <div class="col-md-6 text-center">
-                    <img class="img-responsive img-border img-full" src="img/slide-1.jpg" alt="">
-                    <h2>Post Title
-                        <br>
-                        <small>October 13, 2013</small>
-                    </h2>
-                    <p>Lid est laborum dolo rumes fugats untras. Etharums ser quidem rerum facilis dolores nemis omnis fugats vitaes nemo minima rerums unsers sadips amets. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-                    <a href="#" class="btn btn-default btn-lg">Read More</a>
-                    <hr>
+                <div class="col-lg-12 text-center" id="noneArticle">
+                    You haven't written any articles.
                 </div>
-                <div class="col-md-6 text-center">
-                    <img class="img-responsive img-border img-full" src="img/slide-2.jpg" alt="">
-                    <h2>Post Title
-                        <br>
-                        <small>October 13, 2013</small>
-                    </h2>
-                    <p>Lid est laborum dolo rumes fugats untras. Etharums ser quidem rerum facilis dolores nemis omnis fugats vitaes nemo minima rerums unsers sadips amets. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-                    <a href="#" class="btn btn-default btn-lg">Read More</a>
-                    <hr>
-                </div>
-                <div class="col-md-6 text-center">
-                    <img class="img-responsive img-border img-full" src="img/slide-3.jpg" alt="">
-                    <h2>Post Title
-                        <br>
-                        <small>October 13, 2013</small>
-                    </h2>
-                    <p>Lid est laborum dolo rumes fugats untras. Etharums ser quidem rerum facilis dolores nemis omnis fugats vitaes nemo minima rerums unsers sadips amets. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-                    <a href="#" class="btn btn-default btn-lg">Read More</a>
-                    <hr>
-                </div>
-                <div class="clearfix"></div>
+                <div class="col-lg-12 text-center" id="blogList"></div>
+                <div class='clearfix'></div>
                 <div class="col-lg-12 text-center">
                     <ul class="pager">
-                        <li class="previous"><a href="#">&larr; Older</a>
+                        <li class="previous col-md-6 text-left">
                         </li>
-                        <li class="next"><a href="#">Newer &rarr;</a>
+                        <li class="next col-md-6 text-right">
                         </li>
                     </ul>
                 </div>

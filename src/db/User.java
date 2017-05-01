@@ -22,12 +22,15 @@ public class User {
 //	private ArrayList<String> siteNames; // the keys of the places this user has been to
 	private HashSet<String> siteNames;
 	
+	private ArrayList<Blog> articles;
+	
 	public void setup(String username, String lastname, String firstname, String pwd) {
 		this.username = username;
 		this.lastname = lastname;
 		this.firstname = firstname;
 		this.pwd = pwd;
 		siteNames = new HashSet<String>();
+		articles = new ArrayList<Blog>();
 	}
 	
 	public String getUsername() {
@@ -77,9 +80,22 @@ public class User {
 		this.pwd = pwd;
 	}
 	
+	
+	
+	public ArrayList<Blog> getArticles() {
+		return articles;
+	}
+
+	public void setArticles(ArrayList<Blog> articles) {
+		this.articles = articles;
+	}
+
 	public void addPlaces(ArrayList<String> places) {
-		System.out.println("try to add things");
 		siteNames.addAll(places);
+	}
+	
+	public void addBlog(Blog blog) {
+		articles.add(blog);
 	}
 	
 	public void deletePlace(String place) {
