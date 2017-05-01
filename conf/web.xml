@@ -37,7 +37,35 @@
     <url-pattern>/home/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>BlogServlet</servlet-name>
+    <servlet-class>servlets.BlogServlet</servlet-class>
+  </servlet>
 
+  <servlet-mapping>
+    <servlet-name>BlogServlet</servlet-name>
+    <url-pattern>/blog/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ExploreServlet</servlet-name>
+    <servlet-class>servlets.ExploreServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ExploreServlet</servlet-name>
+    <url-pattern>/explore/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ArticleServlet</servlet-name>
+    <servlet-class>servlets.ArticleServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ArticleServlet</servlet-name>
+    <url-pattern>/article/*</url-pattern>
+  </servlet-mapping>
 
 </web-app>
 

@@ -16,7 +16,7 @@ import org.json.simple.parser.JSONParser;
 
 public class Geolocation {
 	
-	private static DBWrapper wrapper = DBWrapper.getDB("/Users/zhongwen/Dropbox/Spring2017/594/project/db");
+	private static DBWrapper wrapper = DBWrapper.getDB("storage");
 	
 	public static void main(String[] args) {
 		wrapper.setupStore();
@@ -91,7 +91,7 @@ public class Geolocation {
 		ArrayList<String> res = new ArrayList<>();
 		Scanner in = null;
 		try {
-			in = new Scanner(new File("/Users/zhongwen/Dropbox/Spring2017/594/project/data/PPR_Assets.csv"));
+			in = new Scanner(new File("data/PPR_Assets.csv"));
 			
 			while(in.hasNextLine()) {
 				res.add(in.nextLine());

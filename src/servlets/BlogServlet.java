@@ -113,7 +113,7 @@ public class BlogServlet extends HttpServlet {
 			System.out.println("size: " + multifiles.size());
 			String title = multifiles.get(0).getString();
 			String article = multifiles.get(2).getString();
-			String fileFolder = "/Users/zhongwen/Desktop/Tomcat/webapps/blogImg/" + username;
+			String fileFolder = "/usr/local/apache-tomcat-8.5.13/webapps/blogImg/" + username;
 			File userFolder = new File(fileFolder);
 			if(!userFolder.exists()) {
 				userFolder.mkdirs();

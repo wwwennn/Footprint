@@ -78,6 +78,7 @@ public class HomeServlet extends HttpServlet {
 		if("/search".equals(pathinfo)) {
 			String searchKey = request.getParameter("searchKey");
 			ArrayList<String> siteNames = wrapper.getSearchPlaces(searchKey.toLowerCase());
+			System.out.println("size is " + siteNames.size());
 			response.setContentType("application/json");
 			new Gson().toJson(siteNames, response.getWriter());
 			return;

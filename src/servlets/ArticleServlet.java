@@ -60,7 +60,7 @@ public class ArticleServlet extends HttpServlet {
 		String pathinfo = request.getPathInfo();
 		
 		System.out.println("article got a post request");
-		dealer = new HtmlDealer("/Users/zhongwen/Dropbox/Spring2017/594/project/Footprint/webpage/article.html");
+		dealer = new HtmlDealer("webpage/article.html");
 //		ServletOutputStream out = response.getOutputStream();
 //		out.println(dealer.getWebPage());
 //		response.setStatus(response.SC_MOVED_TEMPORARILY);
@@ -77,7 +77,7 @@ public class ArticleServlet extends HttpServlet {
 		}
 		DBWrapper wrapper = DBWrapper.getDB(getServletContext().getInitParameter("dbroot"));
 		System.out.println("article got a get request");
-		dealer = new HtmlDealer("/Users/zhongwen/Dropbox/Spring2017/594/project/Footprint/webpage/article.html");
+		dealer = new HtmlDealer("/home/botian/Documents/CIT594/Footprint/webpage/article.html");
 		String articleName = request.getParameter("article");
 		String username = (String)session.getAttribute("username");
 		String timestamp = request.getParameter("timestamp");
