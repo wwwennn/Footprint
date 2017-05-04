@@ -20,7 +20,7 @@ import com.sleepycat.persist.model.Persistent;
  */
 
 @Persistent
-public class DBWrapper {
+public class DBWrapper implements DBWrapperInterface {
 	
 	private static String envDirectory = null;
 	
